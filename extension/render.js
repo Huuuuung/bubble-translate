@@ -244,7 +244,9 @@
     const hz = fit((s) => layout(ctx, text, r.w, r.h, s), minSize, maxSize);
     // Horizontal reads best and keeps the page uniform; vertical only when horizontal gets cramped.
     const vt = r.h > 1.6 * r.w && !isLatin(text) ? fit((s) => vlayout(text, r.w, r.h, s), minSize, maxSize) : null;
-    if (vt && !vt.tight && (hz.tight || vt.size > hz.size * 1.4)) return { vertical: true, size: vt.size };
+    // A short line that fits one column reads naturally top to bottom, and horizontal would chop its words.
+    const oneCol = vt && !vt.tight && vt.lay.cols.length === 1 && vt.size >= hz.size;
+    if (vt && !vt.tight && (hz.tight || oneCol || vt.size > hz.size * 1.4)) return { vertical: true, size: vt.size };
     return { vertical: false, size: hz.size, tight: !!hz.tight };
   }
 
@@ -479,8 +481,12 @@
         const cx = (box.x0 + box.x1) / 2, cy = (box.y0 + box.y1) / 2;
         const dist = (b) => Math.hypot((b.x0 + b.x1) / 2 - cx, (b.y0 + b.y1) / 2 - cy);
         let near = blocks.filter((b) => !b.used && ov(b, ex) > 0.5 * area(b));
-        // Boxes off: the closest lettering nobody has used is still the best bet.
-        if (!near.length && !trustBoxes) near = blocks.filter((b) => !b.used).sort((a, b) => dist(a) - dist(b)).slice(0, 1);
+        // Boxes off (or this one drifted): the closest lettering nobody has used is still a better bet than
+        // a label on the artwork. A drifted box still lands within a couple of its own sizes of the text.
+        if (!near.length) {
+          const reach = trustBoxes ? 2 * Math.hypot(bw, bh) : Infinity;
+          near = blocks.filter((b) => !b.used && dist(b) < reach).sort((a, b) => dist(a) - dist(b)).slice(0, 1);
+        }
         if (!near.length) return null;
         near.sort((a, b) => ov(b, box) - ov(a, box) || dist(a) - dist(b));
         // Start from the best block and absorb its close neighbours (one speech split into pieces).
