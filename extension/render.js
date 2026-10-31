@@ -209,12 +209,25 @@
   const VERT = { '，': '︐', ',': '︐', '。': '︒', '、': '︑', '：': '︓', '；': '︔', '“': '﹁', '”': '﹂',
     '「': '﹁', '」': '﹂', '『': '﹃', '』': '﹄', '（': '︵', '）': '︶', '(': '︵', ')': '︶',
     '…': '︙', '—': '︱', '-': '︱', 'ー': '︱', '～': '︴', '~': '︴', '!': '！', '?': '？' };
+  const NOSTART = /^(?:[︒︐︑︓︔︙︶﹂﹄]|[!?！？]+)$/u;
   function vlayout(text, w, h, size) {
-    const chars = [...text].map((c) => VERT[c] || c);
+    // One cell per character, except that "！？", "！！" and the like share a cell, side by side
+    // (as vertical lettering does), so they never split.
+    const chars = [];
+    for (const c of text) {
+      const v = VERT[c] || c, last = chars[chars.length - 1];
+      if (/[！？]/.test(v) && last && /^[!?！？]+$/.test(last)) chars[chars.length - 1] = (last + v).replace(/！/g, '!').replace(/？/g, '?');
+      else chars.push(v);
+    }
     const step = size * 1.06, colW = size * 1.2;
     const per = Math.max(1, Math.floor(h / step));
     const cols = [];
-    for (let i = 0; i < chars.length; i += per) cols.push(chars.slice(i, i + per));
+    // A column never starts with closing punctuation: it stays at the end of the previous one.
+    for (let i = 0; i < chars.length;) {
+      let j = Math.min(chars.length, i + per);
+      while (j < chars.length && NOSTART.test(chars[j])) j++;
+      cols.push(chars.slice(i, j)); i = j;
+    }
     return { cols, step, colW, ok: cols.length * colW <= w * 1.05 };
   }
 
@@ -327,6 +340,24 @@
     return b;
   }
 
+  // The widest rectangle inside bubble b's mask over a band of rows f of its height (centred on the
+  // middle), kept m pixels from the edge. Null if it is too small.
+  function inscribed(b, f, m) {
+    const cx = Math.round(b.bw / 2), cy = Math.round(b.bh / 2), half = Math.round(f * b.bh / 2);
+    const ya = Math.max(0, cy - half), yb = Math.min(b.bh - 1, cy + half);
+    let L = 0, R = b.bw - 1;
+    for (let y = ya; y <= yb; y++) {
+      const row = y * b.bw;
+      if (!b.mask[row + cx]) return null;
+      let l = cx, r = cx;
+      while (l > 0 && b.mask[row + l - 1]) l--;
+      while (r < b.bw - 1 && b.mask[row + r + 1]) r++;
+      L = Math.max(L, l); R = Math.min(R, r);
+    }
+    const q = { x: b.x0 + L + m, y: b.y0 + ya + m, w: R - L - 2 * m, h: yb - ya - 2 * m };
+    return q.w >= 8 && q.h >= 8 ? q : null;
+  }
+
   function roundRect(ctx, x, y, w, h, rad) {
     ctx.beginPath();
     ctx.moveTo(x + rad, y);
@@ -390,7 +421,8 @@
       // Pass 1: lines the model numbered, or whose box sits mostly inside a detected bubble.
       const parsed = (reg.items || []).map((it) => ({
         // Spaces matter between words, not between CJK characters.
-        tr: String(it.tr || '').replace(/\s+/g, ' ').trim()
+        // "..." as one ellipsis character, as letterers do: it saves width in narrow balloons.
+        tr: String(it.tr || '').replace(/\s+/g, ' ').replace(/\.{3}/g, '…').trim()
           .replace(new RegExp(`([${CJK}]) `, 'gu'), '$1').replace(new RegExp(` ([${CJK}])`, 'gu'), '$1'),
         box: Array.isArray(it.box) && it.box.length === 4 ? toPx(it.box) : null,
         b: bubbles[(Number(it.bubble) || 0) - 1] || null,
@@ -400,11 +432,15 @@
       // second opinion. First keep the lines whose box agrees with their number, then fix the others.
       const agrees = (x) => x.b && x.box && area(x.box) > 0 && ov(x.b, x.box) >= 0.3 * area(x.box);
       const claimed = new Set(parsed.filter(agrees).map((x) => x.b));
+      // Some answers get every number right but every box wrong. When most numbered boxes miss their
+      // own bubble, the boxes are noise: go by the numbers alone.
+      const numbered = parsed.filter((x) => x.b && x.box && area(x.box) > 0);
+      const trustBoxes = numbered.filter(agrees).length >= 0.5 * numbered.length;
       const center = (q) => [(q.x0 + q.x1) / 2, (q.y0 + q.y1) / 2];
       const done = new Set();
       // a) Box lies on a different bubble nobody has: move there.
       for (const x of parsed) {
-        if (!x.b || !x.box || agrees(x) || !(area(x.box) > 0)) continue;
+        if (!trustBoxes || !x.b || !x.box || agrees(x) || !(area(x.box) > 0)) continue;
         const own = ov(x.b, x.box);
         const alt = bubbles.filter((q) => q !== x.b && !claimed.has(q) && ov(q, x.box) > 0.3 * area(x.box) && ov(q, x.box) > 2 * own)
           .sort((p, q) => ov(q, x.box) - ov(p, x.box))[0];
@@ -412,7 +448,7 @@
       }
       // b) Its number is taken by a line that does sit there: take the nearest free bubble instead.
       for (const x of parsed) {
-        if (!x.b || !x.box || done.has(x) || agrees(x) || !claimed.has(x.b)) continue;
+        if (!trustBoxes || !x.b || !x.box || done.has(x) || agrees(x) || !claimed.has(x.b)) continue;
         const [cx, cy] = center(x.box);
         const reach = Math.max(Math.hypot(x.box.x1 - x.box.x0, x.box.y1 - x.box.y0), Math.hypot(x.b.bw, x.b.bh));
         const free = bubbles.filter((q) => !claimed.has(q))
@@ -423,7 +459,7 @@
       for (const x of parsed) {
         const { tr, box } = x;
         let b = x.b;
-        if (b && box && area(box) > 0 && !done.has(x) && !agrees(x)) {
+        if (trustBoxes && b && box && area(box) > 0 && !done.has(x) && !agrees(x)) {
           claimed.add(b);
           const pad = { x0: b.x0 - 0.3 * b.bw, y0: b.y0 - 0.3 * b.bh, x1: b.x1 + 0.3 * b.bw, y1: b.y1 + 0.3 * b.bh };
           // Box nowhere near the numbered outline and no other bubble under it: likely the
@@ -442,7 +478,9 @@
         const ex = { x0: box.x0 - 0.5 * bw, y0: box.y0 - 0.5 * bh, x1: box.x1 + 0.5 * bw, y1: box.y1 + 0.5 * bh };
         const cx = (box.x0 + box.x1) / 2, cy = (box.y0 + box.y1) / 2;
         const dist = (b) => Math.hypot((b.x0 + b.x1) / 2 - cx, (b.y0 + b.y1) / 2 - cy);
-        const near = blocks.filter((b) => !b.used && ov(b, ex) > 0.5 * area(b));
+        let near = blocks.filter((b) => !b.used && ov(b, ex) > 0.5 * area(b));
+        // Boxes off: the closest lettering nobody has used is still the best bet.
+        if (!near.length && !trustBoxes) near = blocks.filter((b) => !b.used).sort((a, b) => dist(a) - dist(b)).slice(0, 1);
         if (!near.length) return null;
         near.sort((a, b) => ov(b, box) - ov(a, box) || dist(a) - dist(b));
         // Start from the best block and absorb its close neighbours (one speech split into pieces).
@@ -498,6 +536,18 @@
         // Fallback area for words that won't fit: nearly the whole bubble width, middle part of its height
         // (a balloon is widest across its middle).
         const wr = { x: b.x0 + b.bw * 0.04, y: b.y0 + b.bh * 0.15, w: b.bw * 0.92, h: b.bh * 0.7 };
+        if (n === 1) {
+          // One line: fit the text to the balloon's real shape (spiky or narrow balloons are smaller
+          // inside than their bounding box). Try bands of different heights, keep the biggest text.
+          let best = null;
+          for (const f of [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.96]) {
+            const q = inscribed(b, f, Math.max(3 * k, 0.05 * Math.min(b.bw, b.bh)));
+            if (!q) continue;
+            const p = plan(ctx, trs[0], q, MIN, MAX), score = (p.tight ? 0 : 1000) + p.size;
+            if (!best || score > best.score) best = { score, q };
+          }
+          if (best) { texts.push({ tr: trs[0], r: best.q }); continue; }
+        }
         trs.forEach((tr, i) => texts.push({ tr, r: part(r, i), wide: part(wr, i) }));
       }
       // 2) Lines outside any closed bubble: white label over the original lettering.
@@ -511,11 +561,39 @@
           g = growToInk(white, W, H, bx, k);
         }
         // Horizontal text in a tall, narrow spot (vertical lettering): make room sideways over blank paper.
+        // No white label here: a rectangle would spill over the balloon's curved edge. Only the original
+        // lettering is whitened, and the English goes in an area that is blank paper on every row.
         if (isLatin(tr) && g.x1 - g.x0 < 0.8 * (g.y1 - g.y0)) {
-          const cy = (g.y0 + g.y1) / 2, hh = (g.y1 - g.y0) * 0.35;
-          const mid = growInWhite(white, W, H, { x0: g.x0, x1: g.x1, y0: Math.round(cy - hh), y1: Math.round(cy + hh) },
-            0.8 * (g.y1 - g.y0), k);
-          g = { ...g, x0: mid.x0, x1: mid.x1 };
+          // The lettering box can be a pixel short of the glyphs' edges; take a little margin.
+          const e = Math.max(2, Math.round(2 * k)), gcy = (g.y0 + g.y1) / 2, hh = (g.y1 - g.y0) * 0.35;
+          const g0 = { x0: Math.max(0, g.x0 - e), y0: Math.max(0, g.y0 - e), x1: Math.min(W - 1, g.x1 + e), y1: Math.min(H - 1, g.y1 + e) };
+          const mid = growInWhite(white, W, H, { x0: g0.x0, x1: g0.x1, y0: Math.round(gcy - hh), y1: Math.round(gcy + hh) },
+            3 * (g.y1 - g.y0), k);
+          const inGlyph = (x, y) => x >= g0.x0 && x <= g0.x1 && y >= g0.y0 && y <= g0.y1;
+          const rowFree = (y, xa, xb) => { let n = 0;
+            for (let x = xa; x <= xb; x++) if (!inGlyph(x, y)) n += 1 - white[y * W + x];
+            return n <= 0.01 * (xb - xa + 1); };
+          let best = null;
+          // Wider is better until the balloon's curve cuts the height short: try a few widths, keep the
+          // one that gives the biggest text.
+          for (const f of [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3]) {
+            const xa = Math.max(0, Math.round(g0.x0 - (g0.x0 - mid.x0) * f));
+            const xb = Math.min(W - 1, Math.round(g0.x1 + (mid.x1 - g0.x1) * f));
+            const cy = Math.round(gcy), lim = 1.5 * (g0.y1 - g0.y0);
+            let ya = cy, yb = cy;
+            while (ya > 0 && cy - ya < lim && rowFree(ya - 1, xa, xb)) ya--;
+            while (yb < H - 1 && yb - cy < lim && rowFree(yb + 1, xa, xb)) yb++;
+            const m = 3 * k, r = { x: xa + m, y: ya + m, w: xb - xa - 2 * m, h: yb - ya - 2 * m };
+            if (r.w < 8 || r.h < 8) continue;
+            const p = plan(ctx, tr, r, MIN, MAX), score = (p.tight ? 0 : 1000) + p.size;
+            if (!best || score > best.score) best = { score, r };
+          }
+          if (best) {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(g0.x0, g0.y0, g0.x1 - g0.x0 + 1, g0.y1 - g0.y0 + 1);
+            texts.push({ tr, r: best.r });
+            continue;
+          }
         }
         const gw = g.x1 - g.x0, gh = g.y1 - g.y0;
         const pad = (text ? 0.15 : 0.08) * Math.min(gw, gh) + 3 * k;
