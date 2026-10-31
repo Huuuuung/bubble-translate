@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "Manga Lens"
+    "message": "Bubble Translate – Manga Translator"
   },
   "extDesc": {
     "message": "Translate manga on any page with your own DeepSeek or Gemini API key. Finds the speech bubbles, wipes the original text and letters the translation in."
@@ -66,7 +66,7 @@
     "message": "thinking mode is on"
   },
   "optTitle": {
-    "message": "Manga Lens settings"
+    "message": "Bubble Translate settings"
   },
   "optSub": {
     "message": "Press Alt+Shift+J (or click the icon) to translate what's on screen; turn the page, scroll or press again to restore. Your key is stored only in this browser."

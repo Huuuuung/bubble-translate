@@ -514,5 +514,5 @@
     return out;
   }
 
-  root.MangaLens = { detect, textBlocks, markBubbles, render };
+  root.BubbleTranslate = { detect, textBlocks, markBubbles, render };
 })();

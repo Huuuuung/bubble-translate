@@ -1,6 +1,6 @@
 <p align="center"><img src="extension/icons/128.png" width="96"></p>
 
-<h1 align="center">Manga Lens</h1>
+<h1 align="center">Bubble Translate</h1>
 
 <p align="center">Translate manga on any web page with <b>your own</b> DeepSeek or Gemini API key.<br>
 About 4 seconds and a fraction of a cent for two pages. No server, no subscription.</p>
@@ -8,11 +8,11 @@ About 4 seconds and a fraction of a cent for two pages. No server, no subscripti
 <p align="center"><a href="README.zh-CN.md">简体中文</a></p>
 
 <p align="center"><img src="demo/before-after.jpg" width="820"></p>
-<p align="center"><sub>Demo pages are original art made for this repo. Left: original. Right: Manga Lens, DeepSeek, about 4 s.</sub></p>
+<p align="center"><sub>Demo pages are original art made for this repo. Left: original. Right: Bubble Translate, DeepSeek, about 4 s.</sub></p>
 
 ## What it does
 
-Press **Alt+Shift+J** (or click the icon) while reading. Manga Lens:
+Press **Alt+Shift+J** (or click the icon) while reading. Bubble Translate:
 
 1. takes a screenshot of what is on screen and finds the manga pages, including ones drawn on a `<canvas>`;
 2. finds the speech bubbles and text **locally**, in your browser, and numbers them;
@@ -35,7 +35,7 @@ Not on the Chrome Web Store yet. Load it unpacked:
 1. Download this repo (Code → Download ZIP) and unzip it.
 2. Open `chrome://extensions`, turn on **Developer mode**.
 3. Click **Load unpacked** and pick the `extension` folder.
-4. Right-click the Manga Lens icon → **Options**, choose DeepSeek or Gemini, paste your key, press **Test**, then **Save**.
+4. Right-click the Bubble Translate icon → **Options**, choose DeepSeek or Gemini, paste your key, press **Test**, then **Save**.
 
 Get a key: [DeepSeek](https://platform.deepseek.com/api_keys) · [Gemini](https://aistudio.google.com/apikey)
 

@@ -1,6 +1,6 @@
 <p align="center"><img src="extension/icons/128.png" width="96"></p>
 
-<h1 align="center">Manga Lens 漫画翻译</h1>
+<h1 align="center">气泡翻译 Bubble Translate</h1>
 
 <p align="center">用<b>你自己的</b> DeepSeek 或 Gemini API key 翻译任意网页上的漫画。<br>
 两页约 4 秒，花费不到一分钱。没有服务器，不用订阅。</p>
@@ -8,11 +8,11 @@
 <p align="center"><a href="README.md">English</a></p>
 
 <p align="center"><img src="demo/before-after.zh-CN.jpg" width="820"></p>
-<p align="center"><sub>演示页是为本仓库原创的图。左：原图；右：Manga Lens + DeepSeek，约 4 秒。</sub></p>
+<p align="center"><sub>演示页是为本仓库原创的图。左：原图；右：气泡翻译 + DeepSeek，约 4 秒。</sub></p>
 
 ## 它做什么
 
-看漫画时按 **Alt+Shift+J**（或点插件图标），Manga Lens 会：
+看漫画时按 **Alt+Shift+J**（或点插件图标），气泡翻译 会：
 
 1. 截下当前画面，找到漫画页（包括画在 `<canvas>` 上的）；
 2. 在你的浏览器里**本地**找出对话框和文字，并编号；
@@ -35,7 +35,7 @@
 1. 下载本仓库（Code → Download ZIP）并解压。
 2. 打开 `chrome://extensions`，打开右上角**开发者模式**。
 3. 点**加载已解压的扩展程序**，选 `extension` 文件夹。
-4. 右键 Manga Lens 图标 → **选项**，选 DeepSeek 或 Gemini，粘贴 key，点**测试**，再点**保存**。
+4. 右键 气泡翻译 图标 → **选项**，选 DeepSeek 或 Gemini，粘贴 key，点**测试**，再点**保存**。
 
 申请 key：[DeepSeek](https://platform.deepseek.com/api_keys) · [Gemini](https://aistudio.google.com/apikey)
 

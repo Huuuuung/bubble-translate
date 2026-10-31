@@ -5,16 +5,16 @@
   // After the extension is reloaded, the tab still holds the old copy of this script, cut off from
   // the extension. Only skip loading if the copy already here is still connected.
   const rt = chrome.runtime;
-  const prev = window.__mangaLensContent;
+  const prev = window.__bubbleTranslateContent;
   if (prev && typeof prev.alive === 'function' && prev.alive()) return;
-  window.__mangaLensContent = { alive: () => { try { return !!rt.id; } catch { return false; } } };
+  window.__bubbleTranslateContent = { alive: () => { try { return !!rt.id; } catch { return false; } } };
 
   let overlay = null, busy = false, cancelled = false, toastEl = null, toastTimer = 0;
 
   // Our own layers (and ones an older copy of this script left behind). Old versions didn't tag
   // their elements, so also match them by the style they used.
   function isOurs(el) {
-    if (el.dataset && el.dataset.mangaLens) return true;
+    if (el.dataset && el.dataset.bubbleTranslate) return true;
     const s = el.style || {};
     if (el.tagName === 'CANVAS' && s.zIndex === '2147483646' && s.pointerEvents === 'none') return true;
     return el.tagName === 'DIV' && s.zIndex === '2147483647' && s.position === 'fixed' && s.pointerEvents === 'none';
@@ -34,7 +34,7 @@
   function toast(text, { error = false, ms = 0 } = {}) {
     if (!toastEl) {
       toastEl = document.createElement('div');
-      toastEl.dataset.mangaLens = 'toast';
+      toastEl.dataset.bubbleTranslate = 'toast';
       toastEl.style.cssText = 'position:fixed;top:12px;right:12px;z-index:2147483647;padding:8px 12px;border-radius:8px;' +
         'font:14px/1.4 "Microsoft YaHei",sans-serif;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none;max-width:360px';
       document.documentElement.appendChild(toastEl);
@@ -105,7 +105,7 @@
     ctx.drawImage(shot, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
     const image = c.toDataURL('image/jpeg', 0.9);
     if (!bubbles.length) return { image };
-    MangaLens.markBubbles(ctx, bubbles, r, s);
+    BubbleTranslate.markBubbles(ctx, bubbles, r, s);
     return { image, marked: c.toDataURL('image/jpeg', 0.9) };
   }
 
@@ -125,10 +125,10 @@
       const regions = pages.map((p) => {
         const rect = { x: Math.round(p.x * k), y: Math.round(p.y * k), w: Math.round(p.w * k), h: Math.round(p.h * k) };
         rect.w = Math.min(rect.w, shot.width - rect.x); rect.h = Math.min(rect.h, shot.height - rect.y);
-        const blocks = MangaLens.textBlocks(data, shot.width, rect, k);
+        const blocks = BubbleTranslate.textBlocks(data, shot.width, rect, k);
         // A real bubble holds at least one block of lettering; white walls, doors and windows don't.
         // Fewer false outlines also means fewer wrong numbers for the model to pick.
-        const bubbles = MangaLens.detect(data, shot.width, rect, k).filter((b) => blocks.some((t) => {
+        const bubbles = BubbleTranslate.detect(data, shot.width, rect, k).filter((b) => blocks.some((t) => {
           const cx = (t.x0 + t.x1) / 2, cy = (t.y0 + t.y1) / 2;
           return cx > b.x0 && cx < b.x1 && cy > b.y0 && cy < b.y1;
         }));
@@ -144,10 +144,10 @@
       if (err && results.every((r) => !r || r.error)) throw new Error(err.error);
       regions.forEach((r, i) => { r.items = (results[i] && results[i].items) || []; });
       const n = regions.reduce((a, r) => a + r.items.length, 0);
-      const painted = MangaLens.render(shot, regions, { k });
+      const painted = BubbleTranslate.render(shot, regions, { k });
       painted.style.cssText = `position:fixed;left:0;top:0;width:${innerWidth}px;height:${innerHeight}px;` +
         'z-index:2147483646;pointer-events:none';
-      painted.dataset.mangaLens = 'overlay';
+      painted.dataset.bubbleTranslate = 'overlay';
       if (overlay) overlay.remove();
       overlay = painted;
       removeStale();
@@ -157,7 +157,7 @@
       const tEnd = Date.now(), t0 = tStart || tRun;
       const think = results.some((r) => r && r.thinking);
       const detail = `${t('tCapture')} ${s(tRun - t0)} · ${t('tDetect')} ${s(tModel - tRun)} · ${t('tModel')} ${s(tDraw - tModel)} · ${t('tDraw')} ${s(tEnd - tDraw)}${think ? ' · ' + t('tThinking') : ''}`;
-      document.documentElement.dataset.mangaLensTiming = `${s(tEnd - t0)}s | ${detail}`;
+      document.documentElement.dataset.bubbleTranslateTiming = `${s(tEnd - t0)}s | ${detail}`;
       toast(n ? t('toastDone', n, s(tEnd - t0), detail) : t('toastNone'), { ms: 5000, error: !n });
     } finally {
       busy = false;

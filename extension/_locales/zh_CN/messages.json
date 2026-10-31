@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "Manga Lens 漫画翻译"
+    "message": "气泡翻译 – 网页漫画翻译"
   },
   "extDesc": {
     "message": "用你自己的 DeepSeek 或 Gemini API key 翻译任意网页上的漫画：找出对话框、抹掉原文、把译文排进去。"
@@ -66,7 +66,7 @@
     "message": "思考模式开着"
   },
   "optTitle": {
-    "message": "Manga Lens 设置"
+    "message": "气泡翻译 设置"
   },
   "optSub": {
     "message": "按 Alt+Shift+J（或点插件图标）翻译当前画面；翻页、滚动或再按一次就还原。key 只存在这个浏览器里。"
