@@ -1,0 +1,149 @@
+{
+  "extName": {
+    "message": "Manga Lens 漫画翻译"
+  },
+  "extDesc": {
+    "message": "用你自己的 DeepSeek 或 Gemini API key 翻译任意网页上的漫画：找出对话框、抹掉原文、把译文排进去。"
+  },
+  "actionTitle": {
+    "message": "翻译当前画面（再按一次还原）"
+  },
+  "cmdDesc": {
+    "message": "翻译当前画面 / 还原"
+  },
+  "toastNoKey": {
+    "message": "还没填 API key：右键插件图标 → 选项"
+  },
+  "toastWorking": {
+    "message": "翻译中…（$n$ 页）",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "toastDone": {
+    "message": "已翻译 $n$ 处，用时 $s$ 秒（$d$）。翻页或再按一次还原",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      },
+      "s": {
+        "content": "$2"
+      },
+      "d": {
+        "content": "$3"
+      }
+    }
+  },
+  "toastNone": {
+    "message": "没找到要翻译的文字"
+  },
+  "toastCancelled": {
+    "message": "已取消"
+  },
+  "toastError": {
+    "message": "出错：$e$",
+    "placeholders": {
+      "e": {
+        "content": "$1"
+      }
+    }
+  },
+  "tCapture": {
+    "message": "截图"
+  },
+  "tDetect": {
+    "message": "找框"
+  },
+  "tModel": {
+    "message": "模型"
+  },
+  "tDraw": {
+    "message": "排版"
+  },
+  "tThinking": {
+    "message": "思考模式开着"
+  },
+  "optTitle": {
+    "message": "Manga Lens 设置"
+  },
+  "optSub": {
+    "message": "按 Alt+Shift+J（或点插件图标）翻译当前画面；翻页、滚动或再按一次就还原。key 只存在这个浏览器里。"
+  },
+  "optProvider": {
+    "message": "用哪家模型"
+  },
+  "optProviderDs": {
+    "message": "DeepSeek（deepseek-flash，能看图）"
+  },
+  "optProviderGm": {
+    "message": "Google Gemini"
+  },
+  "optTarget": {
+    "message": "翻成"
+  },
+  "optThinking": {
+    "message": "让模型先思考再回答"
+  },
+  "optThinkingHint": {
+    "message": "关着快得多（DeepSeek 约 2 秒一页）。开着一页要十几秒，准确度几乎不变。"
+  },
+  "optDsKey": {
+    "message": "DeepSeek API key"
+  },
+  "optGmKey": {
+    "message": "Gemini API key"
+  },
+  "optModel": {
+    "message": "模型"
+  },
+  "optTest": {
+    "message": "测试"
+  },
+  "optSave": {
+    "message": "保存"
+  },
+  "optSaved": {
+    "message": "已保存"
+  },
+  "optNeedKey": {
+    "message": "先填 key"
+  },
+  "optConnecting": {
+    "message": "连接中…"
+  },
+  "optFailed": {
+    "message": "失败：$e$",
+    "placeholders": {
+      "e": {
+        "content": "$1"
+      }
+    }
+  },
+  "optOk": {
+    "message": "连接成功：$m$",
+    "placeholders": {
+      "m": {
+        "content": "$1"
+      }
+    }
+  },
+  "optOkGemini": {
+    "message": "连接成功，可用 $n$ 个模型。推荐带 flash 的：$m$",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      },
+      "m": {
+        "content": "$2"
+      }
+    }
+  },
+  "optReadsImages": {
+    "message": "（能看图）"
+  },
+  "optNoImages": {
+    "message": "（不能看图）"
+  }
+}

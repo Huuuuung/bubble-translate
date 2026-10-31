@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Manga Lens</title>
+<style>
+  :root { color-scheme: light dark; --bg: #fafafa; --fg: #1b1b1b; --muted: #666; --card: #fff; --line: #ddd; --accent: #2f6fde; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #17181a; --fg: #eee; --muted: #9a9a9a; --card: #222326; --line: #3a3b3f; --accent: #6ea0ff; } }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 "Microsoft YaHei", system-ui, sans-serif; }
+  main { max-width: 620px; margin: 32px auto; padding: 0 16px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 20px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+  label { display: block; font-weight: 600; margin: 10px 0 4px; }
+  input[type=text], input[type=password], select { width: 100%; box-sizing: border-box; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .row > input { flex: 1; }
+  button { padding: 7px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--fg); font: inherit; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .hint { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+  #status { margin-left: 10px; color: var(--muted); }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1 data-i18n="optTitle"></h1>
+  <p class="sub" data-i18n="optSub"></p>
+
+  <section>
+    <label for="provider" data-i18n="optProvider"></label>
+    <select id="provider">
+      <option value="deepseek" data-i18n="optProviderDs"></option>
+      <option value="gemini" data-i18n="optProviderGm"></option>
+    </select>
+    <label for="target" data-i18n="optTarget"></label>
+    <input id="target" type="text">
+    <label><input id="thinking" type="checkbox"> <span data-i18n="optThinking"></span></label>
+    <p class="hint" data-i18n="optThinkingHint"></p>
+  </section>
+
+  <section id="ds">
+    <label for="dsKey" data-i18n="optDsKey"></label>
+    <div class="row"><input id="dsKey" type="password" autocomplete="off"><button data-test="deepseek" data-i18n="optTest"></button></div>
+    <label for="dsModel" data-i18n="optModel"></label>
+    <input id="dsModel" type="text">
+    <p class="hint" id="dsOut"></p>
+  </section>
+
+  <section id="gm">
+    <label for="gmKey" data-i18n="optGmKey"></label>
+    <div class="row"><input id="gmKey" type="password" autocomplete="off"><button data-test="gemini" data-i18n="optTest"></button></div>
+    <label for="gmModel" data-i18n="optModel"></label>
+    <input id="gmModel" type="text" list="gmList">
+    <datalist id="gmList"></datalist>
+    <p class="hint" id="gmOut"></p>
+  </section>
+
+  <button class="primary" id="save" data-i18n="optSave"></button><span id="status"></span>
+</main>
+<script src="options.js"></script>
+</body>
+</html>

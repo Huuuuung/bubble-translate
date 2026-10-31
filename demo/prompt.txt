@@ -1,0 +1,17 @@
+Draw one complete black-and-white Japanese manga page (portrait, about 2:3), in a clean modern shonen style with screentone shading. Entirely original characters and setting: two high-school friends, a short-haired girl and a boy with glasses, at a rainy bus stop after school.
+
+Layout: 5 panels with thin black borders and white gutters, read right-to-left.
+
+Speech: 7 white speech bubbles with black outlines and tails, each containing short Japanese dialogue written VERTICALLY in clean, legible manga lettering (typeset font, not handwriting). Use exactly these lines, one per bubble:
+1. 「傘、忘れたの？」
+2. 「…うん。朝は晴れてたし」
+3. 「しょうがないな。入れてあげる」
+4. 「え、いいの？」
+5. 「その代わり、コンビニでアイスおごってね」
+6. 「雨の日にアイス！？」
+7. 「文句ある？」
+
+Also one rectangular narration caption box in the first panel with the text 「放課後、駅前のバス停」 written vertically.
+Add one small sound effect drawn into the art: ザーッ (rain).
+
+Keep the Japanese characters crisp, correctly formed and large enough to read. No English text, no signatures, no watermark, no logos, no existing characters or brands.

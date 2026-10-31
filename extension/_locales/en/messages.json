@@ -1,0 +1,149 @@
+{
+  "extName": {
+    "message": "Manga Lens"
+  },
+  "extDesc": {
+    "message": "Translate manga on any page with your own DeepSeek or Gemini API key. Finds the speech bubbles, wipes the original text and letters the translation in."
+  },
+  "actionTitle": {
+    "message": "Translate what's on screen (press again to restore)"
+  },
+  "cmdDesc": {
+    "message": "Translate what's on screen / restore"
+  },
+  "toastNoKey": {
+    "message": "No API key yet: right-click the extension icon → Options"
+  },
+  "toastWorking": {
+    "message": "Translating… ($n$ pages)",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      }
+    }
+  },
+  "toastDone": {
+    "message": "Translated $n$ lines in $s$ s ($d$). Turn the page or press again to restore.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      },
+      "s": {
+        "content": "$2"
+      },
+      "d": {
+        "content": "$3"
+      }
+    }
+  },
+  "toastNone": {
+    "message": "No text to translate found"
+  },
+  "toastCancelled": {
+    "message": "Cancelled"
+  },
+  "toastError": {
+    "message": "Error: $e$",
+    "placeholders": {
+      "e": {
+        "content": "$1"
+      }
+    }
+  },
+  "tCapture": {
+    "message": "capture"
+  },
+  "tDetect": {
+    "message": "bubbles"
+  },
+  "tModel": {
+    "message": "model"
+  },
+  "tDraw": {
+    "message": "lettering"
+  },
+  "tThinking": {
+    "message": "thinking mode is on"
+  },
+  "optTitle": {
+    "message": "Manga Lens settings"
+  },
+  "optSub": {
+    "message": "Press Alt+Shift+J (or click the icon) to translate what's on screen; turn the page, scroll or press again to restore. Your key is stored only in this browser."
+  },
+  "optProvider": {
+    "message": "Model provider"
+  },
+  "optProviderDs": {
+    "message": "DeepSeek (deepseek-flash, reads images)"
+  },
+  "optProviderGm": {
+    "message": "Google Gemini"
+  },
+  "optTarget": {
+    "message": "Translate into"
+  },
+  "optThinking": {
+    "message": "Let the model think before answering"
+  },
+  "optThinkingHint": {
+    "message": "Off is much faster (about 2 s per page with DeepSeek). On takes 10+ s per page and is rarely more accurate."
+  },
+  "optDsKey": {
+    "message": "DeepSeek API key"
+  },
+  "optGmKey": {
+    "message": "Gemini API key"
+  },
+  "optModel": {
+    "message": "Model"
+  },
+  "optTest": {
+    "message": "Test"
+  },
+  "optSave": {
+    "message": "Save"
+  },
+  "optSaved": {
+    "message": "Saved"
+  },
+  "optNeedKey": {
+    "message": "Enter a key first"
+  },
+  "optConnecting": {
+    "message": "Connecting…"
+  },
+  "optFailed": {
+    "message": "Failed: $e$",
+    "placeholders": {
+      "e": {
+        "content": "$1"
+      }
+    }
+  },
+  "optOk": {
+    "message": "Connected: $m$",
+    "placeholders": {
+      "m": {
+        "content": "$1"
+      }
+    }
+  },
+  "optOkGemini": {
+    "message": "Connected, $n$ models available. Recommended (flash): $m$",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      },
+      "m": {
+        "content": "$2"
+      }
+    }
+  },
+  "optReadsImages": {
+    "message": " (reads images)"
+  },
+  "optNoImages": {
+    "message": " (text only)"
+  }
+}
