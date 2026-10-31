@@ -15,7 +15,7 @@
     "message": "No API key yet: right-click the extension icon → Options"
   },
   "toastWorking": {
-    "message": "Translating… ($n$ pages)",
+    "message": "Translating…",
     "placeholders": {
       "n": {
         "content": "$1"
