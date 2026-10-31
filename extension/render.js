@@ -232,7 +232,7 @@
     // Horizontal reads best and keeps the page uniform; vertical only when horizontal gets cramped.
     const vt = r.h > 1.6 * r.w && !isLatin(text) ? fit((s) => vlayout(text, r.w, r.h, s), minSize, maxSize) : null;
     if (vt && !vt.tight && (hz.tight || vt.size > hz.size * 1.4)) return { vertical: true, size: vt.size };
-    return { vertical: false, size: hz.size };
+    return { vertical: false, size: hz.size, tight: !!hz.tight };
   }
 
   function drawText(ctx, text, r, size, vertical) {
@@ -307,6 +307,22 @@
       if (b.y1 - box.y1 < maxY && b.y1 < H - 1 - step && stripRows(b.y1 + 1, b.y1 + step)) { b.y1 += step; changed = true; }
       if (box.x0 - b.x0 < maxX && b.x0 > step && stripCols(b.x0 - step, b.x0 - 1)) { b.x0 -= step; changed = true; }
       if (b.x1 - box.x1 < maxX && b.x1 < W - 1 - step && stripCols(b.x1 + 1, b.x1 + step)) { b.x1 += step; changed = true; }
+    }
+    return b;
+  }
+
+  // Widen a box sideways across blank paper (e.g. the inside of a balloon we didn't detect), stopping at
+  // the first column with ink in it or once it is `target` wide. Used so horizontal text isn't squeezed
+  // into the narrow column that vertical Japanese occupied.
+  function growInWhite(white, W, H, box, target, k) {
+    const b = { ...box };
+    const step = Math.max(1, Math.round(k));
+    const blank = (x) => { if (x < 0 || x >= W) return false; let ink = 0;
+      for (let y = b.y0; y <= b.y1; y++) ink += 1 - white[y * W + x]; return ink <= 0.02 * (b.y1 - b.y0 + 1); };
+    let left = true, right = true;
+    while ((left || right) && b.x1 - b.x0 < target) {
+      if (left) { if (blank(b.x0 - step)) b.x0 -= step; else left = false; }
+      if (right && b.x1 - b.x0 < target) { if (blank(b.x1 + step)) b.x1 += step; else right = false; }
     }
     return b;
   }
@@ -476,9 +492,13 @@
         const r = { x: b.x0 + b.bw * (1 - s) / 2, y: b.y0 + b.bh * (1 - s) / 2, w: b.bw * s, h: b.bh * s };
         // Several lines in one bubble: split along its long side (right-to-left when tall).
         const n = trs.length, tall = r.h > r.w;
-        trs.forEach((tr, i) => texts.push({ tr, r: tall
-          ? { x: r.x + r.w * (n - 1 - i) / n, y: r.y, w: r.w / n, h: r.h }
-          : { x: r.x, y: r.y + r.h * i / n, w: r.w, h: r.h / n } }));
+        const part = (q, i) => tall
+          ? { x: q.x + q.w * (n - 1 - i) / n, y: q.y, w: q.w / n, h: q.h }
+          : { x: q.x, y: q.y + q.h * i / n, w: q.w, h: q.h / n };
+        // Fallback area for words that won't fit: nearly the whole bubble width, middle part of its height
+        // (a balloon is widest across its middle).
+        const wr = { x: b.x0 + b.bw * 0.04, y: b.y0 + b.bh * 0.15, w: b.bw * 0.92, h: b.bh * 0.7 };
+        trs.forEach((tr, i) => texts.push({ tr, r: part(r, i), wide: part(wr, i) }));
       }
       // 2) Lines outside any closed bubble: white label over the original lettering.
       //    `text` is lettering we found ourselves (exact); `box` is only the model's guess.
@@ -489,6 +509,13 @@
           const bx = { x0: Math.round(box.x0), y0: Math.round(box.y0), x1: Math.round(box.x1), y1: Math.round(box.y1) };
           if (bx.x1 - bx.x0 < 4 || bx.y1 - bx.y0 < 4) continue;
           g = growToInk(white, W, H, bx, k);
+        }
+        // Horizontal text in a tall, narrow spot (vertical lettering): make room sideways over blank paper.
+        if (isLatin(tr) && g.x1 - g.x0 < 0.8 * (g.y1 - g.y0)) {
+          const cy = (g.y0 + g.y1) / 2, hh = (g.y1 - g.y0) * 0.35;
+          const mid = growInWhite(white, W, H, { x0: g.x0, x1: g.x1, y0: Math.round(cy - hh), y1: Math.round(cy + hh) },
+            0.8 * (g.y1 - g.y0), k);
+          g = { ...g, x0: mid.x0, x1: mid.x1 };
         }
         const gw = g.x1 - g.x0, gh = g.y1 - g.y0;
         const pad = (text ? 0.15 : 0.08) * Math.min(gw, gh) + 3 * k;
@@ -503,6 +530,12 @@
         texts.push({ tr, r: { x: lb.x + pad * 0.5, y: lb.y + pad * 0.5, w: lb.w - pad, h: lb.h - pad } });
       }
       // 3) One font size per page: nobody goes above the typical size, small bubbles shrink as needed.
+      // English in a narrow balloon: if even the smallest size has to break words, use the wider area.
+      texts.forEach((t) => {
+        if (!t.wide) return;
+        const p = plan(ctx, t.tr, t.r, MIN, MAX);
+        if (p.tight && !plan(ctx, t.tr, t.wide, MIN, MAX).tight) t.r = t.wide;
+      });
       const plans = texts.map((t) => plan(ctx, t.tr, t.r, MIN, MAX));
       const sizes = plans.map((p) => p.size).sort((a, b) => a - b);
       const cap = sizes.length ? sizes[Math.floor(sizes.length / 2)] : MAX;
