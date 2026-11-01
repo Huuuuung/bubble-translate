@@ -3,7 +3,7 @@
     "message": "Bubble Translate – Manga Translator"
   },
   "extDesc": {
-    "message": "Translate manga on any page with your own DeepSeek or Gemini API key. Finds the speech bubbles, wipes the original text and letters the translation in."
+    "message": "Translate manga on any page with your own DeepSeek or Gemini key. Finds the bubbles, wipes the text and letters the translation in."
   },
   "actionTitle": {
     "message": "Translate what's on screen (press again to restore)"

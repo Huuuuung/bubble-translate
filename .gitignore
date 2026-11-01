@@ -6,3 +6,5 @@ Thumbs.db
 .env
 *.key
 demo/raw/
+store/out/
+dist/
