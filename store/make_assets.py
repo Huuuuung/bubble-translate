@@ -199,7 +199,7 @@ def banner(lang, W, H, out):
     d = ImageDraw.Draw(c)
     x = round(22 * s)
     width = W - pw - x - round(10 * s)
-    icon = Image.open(EXT / "icons" / "128.png").convert("RGBA").resize((round(64 * s),) * 2, Image.LANCZOS)
+    icon = Image.open(EXT / "icons" / "128.png").convert("RGBA").crop((16, 16, 112, 112)).resize((round(64 * s),) * 2, Image.LANCZOS)
     c.alpha_composite(icon, (x, round(34 * s)))
     fn = font(L["font"], round(40 * s))
     words = L["name"].split(" ") if " " in L["name"] else [L["name"]]
