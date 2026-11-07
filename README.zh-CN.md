@@ -2,7 +2,7 @@
 
 <h1 align="center">气泡翻译 Bubble Translate</h1>
 
-<p align="center">用<b>你自己的</b> DeepSeek 或 Gemini API key 翻译任意网页上的漫画。<br>
+<p align="center">用<b>你自己的</b> API key（DeepSeek、Gemini 或任何 OpenAI 兼容接口）翻译任意网页上的漫画。<br>
 两页约 4 秒，花费不到一分钱。没有服务器，不用订阅。</p>
 
 <p align="center"><a href="README.md">English</a></p>
@@ -23,7 +23,7 @@
 
 ## 为什么用它
 
-- **便宜**：DeepSeek `deepseek-flash` 两页约 3000 token；Gemini Flash 有免费额度。
+- **便宜**：DeepSeek `deepseek-flash` 两页约 3000 token；Gemini Flash 有免费额度。也可以接任何 OpenAI 兼容接口，包括在自己电脑上跑的模型。
 - **快**：两页约 4 秒（关掉思考模式）。
 - **隐私**：key 只存在你的浏览器里，图片直接发给你选的模型商，不经过任何第三方。见 [PRIVACY.md](PRIVACY.md)。
 - **大多数阅读器都能用**：它看的是截图，不管网站怎么画页面。
@@ -38,6 +38,20 @@
 4. 右键 气泡翻译 图标 → **选项**，选 DeepSeek 或 Gemini，粘贴 key，点**测试**，再点**保存**。
 
 申请 key：[DeepSeek](https://platform.deepseek.com/api_keys) · [Gemini](https://aistudio.google.com/apikey)
+
+### 其他模型（OpenAI 兼容接口）
+
+在选项里选 **自定义（OpenAI 兼容接口）**，填：
+
+| | 接口地址（base URL） | 模型示例 |
+|---|---|---|
+| OpenAI | `https://api.openai.com/v1` | `gpt-4o-mini` |
+| OpenRouter | `https://openrouter.ai/api/v1` | 任何能看图的模型 |
+| 阿里云百炼（通义千问） | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `qwen-vl-plus` |
+| Ollama（本地） | `http://localhost:11434/v1` | 视觉模型，如 `qwen2.5vl` |
+| LM Studio（本地） | `http://localhost:1234/v1` | 视觉模型 |
+
+模型**必须能看图**。本地服务 key 可以留空。点**测试**或**保存**时，Chrome 会请你允许访问这一个网站；你没允许的网站，扩展都连不上。如果接口不认 DeepSeek 的 `thinking` 开关或 JSON 模式，扩展会自动去掉再试。
 
 Chrome、Edge、Brave 等 Chromium 浏览器都能用。
 

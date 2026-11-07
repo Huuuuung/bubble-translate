@@ -3,7 +3,7 @@
     "message": "Bubble Translate – Manga Translator"
   },
   "extDesc": {
-    "message": "Translate manga on any page with your own DeepSeek or Gemini key. Finds the bubbles, wipes the text and letters the translation in."
+    "message": "Translate manga on any page with your own DeepSeek, Gemini or OpenAI-compatible key. Finds bubbles, wipes text, letters it in."
   },
   "actionTitle": {
     "message": "Translate what's on screen (press again to restore)"
@@ -145,5 +145,56 @@
   },
   "optNoImages": {
     "message": " (text only)"
+  },
+  "toastNoCustom": {
+    "message": "Custom provider not set up yet: right-click the extension icon → Options, fill in the URL and model, then Save"
+  },
+  "optProviderCu": {
+    "message": "Custom (OpenAI-compatible)"
+  },
+  "optCuBase": {
+    "message": "API base URL"
+  },
+  "optCuBaseHint": {
+    "message": "The part before /chat/completions, e.g. https://api.openai.com/v1 · https://openrouter.ai/api/v1 · https://dashscope.aliyuncs.com/compatible-mode/v1 · http://localhost:11434/v1 (Ollama). Chrome asks once for access to this one site when you press Test or Save."
+  },
+  "optCuKey": {
+    "message": "API key (leave empty for a local server)"
+  },
+  "optCuModelHint": {
+    "message": "The model must read images (a vision model). Press Test to list what the server offers."
+  },
+  "optBadBase": {
+    "message": "Enter a URL that starts with https:// or http://"
+  },
+  "optPermDenied": {
+    "message": "Access to $o$ was not allowed, so the extension can't reach it",
+    "placeholders": {
+      "o": {
+        "content": "$1"
+      }
+    }
+  },
+  "optOkCustom": {
+    "message": "Connected, $n$ models: $m$. Pick one that reads images.",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      },
+      "m": {
+        "content": "$2"
+      }
+    }
+  },
+  "optOkCustomVision": {
+    "message": "Connected, $n$ models. These read images: $m$",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      },
+      "m": {
+        "content": "$2"
+      }
+    }
   }
 }

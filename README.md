@@ -2,7 +2,7 @@
 
 <h1 align="center">Bubble Translate</h1>
 
-<p align="center">Translate manga on any web page with <b>your own</b> DeepSeek or Gemini API key.<br>
+<p align="center">Translate manga on any web page with <b>your own</b> API key: DeepSeek, Gemini, or any OpenAI-compatible API.<br>
 About 4 seconds and a fraction of a cent for two pages. No server, no subscription.</p>
 
 <p align="center"><a href="README.zh-CN.md">简体中文</a></p>
@@ -23,7 +23,7 @@ Turn the page, scroll, or press the shortcut again to get the original back.
 
 ## Why
 
-- **Cheap.** DeepSeek `deepseek-flash` costs about 3,000 tokens for two pages. Gemini Flash has a free tier.
+- **Cheap.** DeepSeek `deepseek-flash` costs about 3,000 tokens for two pages. Gemini Flash has a free tier. Or bring any OpenAI-compatible API, including a model running on your own computer.
 - **Fast.** About 4 s for a two-page spread (thinking mode off).
 - **Private.** Your key stays in your browser. Images go straight to the provider you choose, and nowhere else. See [PRIVACY.md](PRIVACY.md).
 - **Works on most readers.** It works from a screenshot, so it doesn't care how the site draws its pages.
@@ -38,6 +38,20 @@ Not on the Chrome Web Store yet. Load it unpacked:
 4. Right-click the Bubble Translate icon → **Options**, choose DeepSeek or Gemini, paste your key, press **Test**, then **Save**.
 
 Get a key: [DeepSeek](https://platform.deepseek.com/api_keys) · [Gemini](https://aistudio.google.com/apikey)
+
+### Other models (OpenAI-compatible)
+
+Choose **Custom (OpenAI-compatible)** in Options and fill in:
+
+| | Base URL | Example model |
+|---|---|---|
+| OpenAI | `https://api.openai.com/v1` | `gpt-4o-mini` |
+| OpenRouter | `https://openrouter.ai/api/v1` | any model that takes images |
+| Alibaba DashScope (Qwen) | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `qwen-vl-plus` |
+| Ollama (local) | `http://localhost:11434/v1` | a vision model, e.g. `qwen2.5vl` |
+| LM Studio (local) | `http://localhost:1234/v1` | a vision model |
+
+The model **must read images**. Leave the key empty for a local server. When you press **Test** or **Save**, Chrome asks once for access to that one site; the extension can't reach any other site you haven't allowed. If the server rejects DeepSeek's `thinking` switch or JSON mode, the extension retries without them.
 
 Works in Chrome, Edge, Brave and other Chromium browsers.
 

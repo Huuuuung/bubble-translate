@@ -3,7 +3,7 @@
     "message": "气泡翻译 – 网页漫画翻译"
   },
   "extDesc": {
-    "message": "用你自己的 DeepSeek 或 Gemini API key 翻译任意网页上的漫画：找出对话框、抹掉原文、把译文排进去。"
+    "message": "用你自己的 AI key（DeepSeek、Gemini 或任何 OpenAI 兼容接口）翻译任意网页上的漫画：找出对话框、抹掉原文、把译文排进去。"
   },
   "actionTitle": {
     "message": "翻译当前画面（再按一次还原）"
@@ -145,5 +145,56 @@
   },
   "optNoImages": {
     "message": "（不能看图）"
+  },
+  "toastNoCustom": {
+    "message": "自定义接口还没设好：右键扩展图标 → 选项，填好地址和模型后点保存"
+  },
+  "optProviderCu": {
+    "message": "自定义（OpenAI 兼容接口）"
+  },
+  "optCuBase": {
+    "message": "接口地址（base URL）"
+  },
+  "optCuBaseHint": {
+    "message": "填 /chat/completions 前面那段，例如 https://api.openai.com/v1 · https://openrouter.ai/api/v1 · https://dashscope.aliyuncs.com/compatible-mode/v1 · http://localhost:11434/v1（Ollama）。点测试或保存时，Chrome 会请你允许访问这一个网站。"
+  },
+  "optCuKey": {
+    "message": "API key（本地服务可留空）"
+  },
+  "optCuModelHint": {
+    "message": "模型必须能看图（视觉模型）。点测试可以列出这个接口有哪些模型。"
+  },
+  "optBadBase": {
+    "message": "请填以 https:// 或 http:// 开头的地址"
+  },
+  "optPermDenied": {
+    "message": "没有允许访问 $o$，扩展连不上它",
+    "placeholders": {
+      "o": {
+        "content": "$1"
+      }
+    }
+  },
+  "optOkCustom": {
+    "message": "连上了，共 $n$ 个模型：$m$。请选能看图的那个。",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      },
+      "m": {
+        "content": "$2"
+      }
+    }
+  },
+  "optOkCustomVision": {
+    "message": "连上了，共 $n$ 个模型。能看图的有：$m$",
+    "placeholders": {
+      "n": {
+        "content": "$1"
+      },
+      "m": {
+        "content": "$2"
+      }
+    }
   }
 }

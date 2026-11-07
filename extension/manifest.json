@@ -10,6 +10,7 @@
     "https://api.deepseek.com/*",
     "https://generativelanguage.googleapis.com/*"
   ],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
   "background": { "service_worker": "background.js" },
   "action": {
     "default_title": "__MSG_actionTitle__",

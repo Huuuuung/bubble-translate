@@ -4,6 +4,7 @@ const DEFAULTS = {
   provider: 'deepseek',
   dsKey: '', dsModel: 'deepseek-flash',
   gmKey: '', gmModel: 'gemini-flash-latest',
+  cuBase: '', cuKey: '', cuModel: '',
   target: chrome.i18n.getUILanguage().toLowerCase().startsWith('zh') ? '简体中文' : 'English',
   thinking: false,
 };
@@ -24,8 +25,10 @@ async function trigger(tab) {
     return;
   }
   const c = await cfg();
-  if (!(c.provider === 'gemini' ? c.gmKey : c.dsKey)) {
-    chrome.tabs.sendMessage(tab.id, { type: 'toast', text: t('toastNoKey'), error: true });
+  const ready = c.provider === 'custom' ? c.cuBase && c.cuModel && (await hasHost(c.cuBase))
+    : c.provider === 'gemini' ? c.gmKey : c.dsKey;
+  if (!ready) {
+    chrome.tabs.sendMessage(tab.id, { type: 'toast', text: t(c.provider === 'custom' ? 'toastNoCustom' : 'toastNoKey'), error: true });
     chrome.runtime.openOptionsPage();
     return;
   }
@@ -44,7 +47,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
     return true;
   }
   if (msg.type === 'listModels') {
-    listModels(msg.provider, msg.key).then((m) => reply({ models: m }), (e) => reply({ error: String(e.message || e) }));
+    listModels(msg.provider, msg.key, msg.base).then((m) => reply({ models: m }), (e) => reply({ error: String(e.message || e) }));
     return true;
   }
 });
@@ -95,9 +98,60 @@ function parseItems(text, yFirst) {
     .filter((it) => it.tr && (it.bubble > 0 || it.box));
 }
 
+// Custom provider: any OpenAI-compatible server (OpenAI, OpenRouter, DashScope compatible-mode, Ollama, LM Studio...).
+// The site was granted in Options with chrome.permissions.request; nothing else is reachable.
+const hostPattern = (base) => { const u = new URL(base); return `${u.protocol}//${u.hostname}/*`; };
+const hasHost = (base) => { try { return chrome.permissions.contains({ origins: [hostPattern(base)] }).catch(() => false); } catch { return false; } };
+const cuHeaders = (key) => ({ 'Content-Type': 'application/json', ...(key ? { Authorization: `Bearer ${key}` } : {}) });
+const cuName = (base) => { try { return new URL(base).host; } catch { return 'Custom'; } };
+// Extras a server turned down with 400, so later pages skip the retry. Per base URL + model; reset when the worker restarts.
+const cuRejected = new Map();
+
+// Reasoning models may wrap the JSON in <think>...</think> or chat around it; keep only the JSON object.
+function jsonOnly(text) {
+  const s = text.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+  const a = s.indexOf('{'), b = s.lastIndexOf('}');
+  return a >= 0 && b > a ? s.slice(a, b + 1) : s;
+}
+
+// OpenAI chat/completions with the images as image_url parts. response_format and DeepSeek's thinking
+// switch are not accepted everywhere: try with them, and on a 400 (or 422) drop them one at a time.
+async function chatCompletions(c, imgs, text) {
+  const id = `${c.cuBase}|${c.cuModel}`;
+  const skip = cuRejected.get(id) || new Set();
+  const extras = [
+    ['thinking', c.thinking ? null : { type: 'disabled' }],
+    ['response_format', { type: 'json_object' }],
+  ].filter(([k, v]) => v && !skip.has(k));
+  const body = {
+    model: c.cuModel,
+    messages: [{ role: 'user', content: [
+      ...imgs.map((u) => ({ type: 'image_url', image_url: { url: u } })),
+      { type: 'text', text },
+    ] }],
+  };
+  for (;;) {
+    const b = { ...body, ...Object.fromEntries(extras) };
+    const r = await fetch(`${c.cuBase}/chat/completions`, { method: 'POST', headers: cuHeaders(c.cuKey), body: JSON.stringify(b) });
+    if ((r.status === 400 || r.status === 422) && extras.length) {
+      skip.add(extras.shift()[0]);
+      cuRejected.set(id, skip);
+      continue;
+    }
+    if (!r.ok) throw new Error(`${cuName(c.cuBase)} ${r.status}: ${(await r.text()).slice(0, 200)}`);
+    const j = await r.json();
+    let content = j.choices?.[0]?.message?.content || '';
+    if (Array.isArray(content)) content = content.map((p) => p.text || '').join('');
+    return content;
+  }
+}
+
 async function translate({ image, marked, title }) {
   const c = await cfg();
   const imgs = marked ? [image, marked] : [image];
+  if (c.provider === 'custom') {
+    return parseItems(jsonOnly(await chatCompletions(c, imgs, prompt(c.target, title, false, !!marked))), false);
+  }
   if (c.provider === 'gemini') {
     const parts = imgs.map((u) => ({ inline_data: { mime_type: 'image/jpeg', data: u.split(',')[1] } }));
     const body = (thinkingOff) => ({
@@ -132,7 +186,18 @@ async function translate({ image, marked, title }) {
   return parseItems(j.choices?.[0]?.message?.content || '', false);
 }
 
-async function listModels(provider, key) {
+async function listModels(provider, key, base) {
+  if (provider === 'custom') {
+    const r = await fetch(`${base}/models`, { headers: cuHeaders(key) });
+    if (!r.ok) throw new Error(`${cuName(base)} ${r.status}: ${(await r.text()).slice(0, 200)}`);
+    const j = await r.json();
+    const list = Array.isArray(j) ? j : j.data || j.models || [];
+    // Only some servers say which models read images (OpenRouter: architecture.input_modalities).
+    return list.map((m) => ({
+      id: m.id || m.name,
+      vision: [m.input_modalities, m.architecture?.input_modalities, m.modalities].some((x) => Array.isArray(x) && x.includes('image')),
+    })).filter((m) => m.id);
+  }
   if (provider === 'gemini') {
     const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': key } });
     if (!r.ok) throw new Error(`Gemini ${r.status}: ${(await r.text()).slice(0, 200)}`);

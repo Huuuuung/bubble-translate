@@ -32,6 +32,7 @@
     <select id="provider">
       <option value="deepseek" data-i18n="optProviderDs"></option>
       <option value="gemini" data-i18n="optProviderGm"></option>
+      <option value="custom" data-i18n="optProviderCu"></option>
     </select>
     <label for="target" data-i18n="optTarget"></label>
     <input id="target" type="text">
@@ -54,6 +55,19 @@
     <input id="gmModel" type="text" list="gmList">
     <datalist id="gmList"></datalist>
     <p class="hint" id="gmOut"></p>
+  </section>
+
+  <section id="cu">
+    <label for="cuBase" data-i18n="optCuBase"></label>
+    <input id="cuBase" type="text" placeholder="https://api.openai.com/v1" spellcheck="false">
+    <p class="hint" data-i18n="optCuBaseHint"></p>
+    <label for="cuKey" data-i18n="optCuKey"></label>
+    <div class="row"><input id="cuKey" type="password" autocomplete="off"><button data-test="custom" data-i18n="optTest"></button></div>
+    <label for="cuModel" data-i18n="optModel"></label>
+    <input id="cuModel" type="text" list="cuList" spellcheck="false">
+    <datalist id="cuList"></datalist>
+    <p class="hint" data-i18n="optCuModelHint"></p>
+    <p class="hint" id="cuOut"></p>
   </section>
 
   <button class="primary" id="save" data-i18n="optSave"></button><span id="status"></span>

@@ -32,7 +32,7 @@ HOW IT WORKS
 • Translate into English, Chinese, Korean, Spanish or any language the model knows.
 
 BRING YOUR OWN KEY
-• Uses your own DeepSeek or Gemini API key. No subscription, no account with us.
+• Uses your own DeepSeek or Gemini API key, or any OpenAI-compatible API (OpenAI, OpenRouter, Qwen, or a local model with Ollama / LM Studio). No subscription, no account with us.
 • Two pages take about four seconds and cost less than a cent with DeepSeek.
 
 PRIVACY
@@ -56,7 +56,7 @@ Free and open source (MIT): https://github.com/Huuuuung/bubble-translate
 • 可以译成中文、英文、韩文、西班牙文，或模型懂的任何语言。
 
 用你自己的 key
-• 用你自己的 DeepSeek 或 Gemini API key，不用订阅，也不用注册我们的账号。
+• 用你自己的 DeepSeek 或 Gemini API key，或任何 OpenAI 兼容接口（OpenAI、OpenRouter、通义千问，或用 Ollama / LM Studio 跑的本地模型），不用订阅，也不用注册我们的账号。
 • 两页大约 4 秒，用 DeepSeek 花费不到一分钱。
 
 隐私
@@ -87,6 +87,8 @@ Translate the text in manga and comic speech bubbles on the page the user is vie
 
 **Permission justifications:**
 
+> Adding `optional_host_permissions` (custom OpenAI-compatible provider, v0.2) changes the permission set, so the update goes through a full review again. Optional permissions show no warning at install.
+
 | Permission | Justification (paste) |
 |---|---|
 | `activeTab` | Only when the user presses the shortcut or clicks the icon, the extension captures the visible tab (captureVisibleTab) to find speech bubbles and read their text. No access to tabs the user didn't act on. |
@@ -94,6 +96,7 @@ Translate the text in manga and comic speech bubbles on the page the user is vie
 | `storage` | Saves the user's settings in chrome.storage.local: chosen AI provider, model, target language and the user's own API key. Nothing is synced or sent to us. |
 | Host `https://api.deepseek.com/*` | Sends the cropped page screenshot and prompt to DeepSeek's API with the user's own key, when the user picked DeepSeek. This is the translation request itself. |
 | Host `https://generativelanguage.googleapis.com/*` | Same as above for Google Gemini, when the user picked Gemini. |
+| Optional host `https://*/*`, `http://*/*` | Only for the "Custom (OpenAI-compatible)" provider. Nothing is granted at install. When the user types an API base URL (e.g. https://openrouter.ai/api/v1 or http://localhost:11434/v1 for a local model) and presses Save or Test, the extension calls chrome.permissions.request for that one origin, and Chrome asks the user. The extension then sends the page screenshot and prompt to that API, the same as for DeepSeek. Declared broadly only because the user can pick any server; each origin needs the user's own approval. |
 
 **Remote code:** No, I am not using remote code. (All JavaScript ships in the package; the extension only sends data to the AI APIs and reads back JSON.)
 
@@ -118,5 +121,5 @@ Translate the text in manga and comic speech bubbles on the page the user is vie
 
 ## Test instructions for the reviewer (optional field)
 ```
-The extension needs an API key to translate. Open the extension's Options page, choose DeepSeek or Gemini and paste a key (a free Gemini key works: https://aistudio.google.com/apikey). Then open any manga page with Japanese text, e.g. a raw chapter on a manga reader, and press Alt+Shift+J or click the toolbar icon. Press again to restore.
+The extension needs an API key to translate. Open the extension's Options page, choose DeepSeek or Gemini and paste a key (or "Custom (OpenAI-compatible)" with any OpenAI-compatible base URL, model and key) (a free Gemini key works: https://aistudio.google.com/apikey). Then open any manga page with Japanese text, e.g. a raw chapter on a manga reader, and press Alt+Shift+J or click the toolbar icon. Press again to restore.
 ```
